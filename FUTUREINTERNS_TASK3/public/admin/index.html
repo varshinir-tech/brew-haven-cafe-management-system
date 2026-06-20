@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Brew Haven Cafe</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="logo">Brew Haven</div>
+    <div class="logo-sub">Admin Dashboard</div>
+    <h2>Sign in to continue</h2>
+    <form class="login-form" id="loginForm">
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="admin@brewhaven.com" required />
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+    <!-- Default credentials hint (remove in production) -->
+    <div class="login-hint">
+      <p><span>Default credentials</span></p>
+      <p>📧 admin@brewhaven.com</p>
+      <p>🔑 admin123</p>
+      <p class="hint-note">Run <code>npm run seed</code> first if login fails</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN APP ==================== -->
+<div class="admin-app" id="adminApp">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name">Brew Haven</div>
+      <div class="logo-tag">Admin Console</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <div class="sidebar-link active" data-page="dashboard">
+        <i class="fa fa-chart-pie"></i> Dashboard
+      </div>
+      <div class="sidebar-link" data-page="orders">
+        <i class="fa fa-shopping-bag"></i> Orders
+      </div>
+      <div class="sidebar-link" data-page="reservations">
+        <i class="fa fa-calendar-alt"></i> Reservations
+      </div>
+      <div class="nav-section-label">Content</div>
+      <div class="sidebar-link" data-page="menu">
+        <i class="fa fa-utensils"></i> Menu Items
+      </div>
+      <div class="sidebar-link" data-page="reviews">
+        <i class="fa fa-star"></i> Reviews
+      </div>
+      <div class="sidebar-link" data-page="messages">
+        <i class="fa fa-envelope"></i> Messages
+      </div>
+      <div class="nav-section-label">More</div>
+      <a class="sidebar-link" href="/" target="_blank">
+        <i class="fa fa-external-link-alt"></i> View Site
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <strong id="adminName">Admin</strong>
+        <span id="adminEmail"></span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fa fa-sign-out-alt"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="main-area">
+    <div class="top-bar">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <button class="icon-btn" id="sidebarToggle" style="display:none;">
+          <i class="fa fa-bars"></i>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="top-bar-actions">
+        <button class="icon-btn" id="refreshBtn" title="Refresh data">
+          <i class="fa fa-sync-alt"></i>
+        </button>
+        <a href="/" class="icon-btn" title="View site" target="_blank">
+          <i class="fa fa-home"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ========== DASHBOARD ========== -->
+      <div class="admin-page active" id="page-dashboard">
+        <div class="stat-cards" id="statCards">
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="fa fa-shopping-bag"></i></div>
+            <div class="stat-card-label">Total Orders</div>
+            <div class="stat-card-value" id="sc-orders">—</div>
+            <div class="stat-card-sub">All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="fa fa-calendar-check"></i></div>
+            <div class="stat-card-label">Reservations</div>
+            <div class="stat-card-value" id="sc-reservations">—</div>
+            <div class="stat-card-sub">All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="fa fa-users"></i></div>
+            <div class="stat-card-label">Total Customers</div>
+            <div class="stat-card-value" id="sc-customers">—</div>
+            <div class="stat-card-sub">Unique guests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="fa fa-rupee-sign"></i></div>
+            <div class="stat-card-label">Revenue</div>
+            <div class="stat-card-value" id="sc-revenue">—</div>
+            <div class="stat-card-sub">From orders</div>
+          </div>
+        </div>
+
+        <div class="chart-row">
+          <div class="chart-card">
+            <h3><i class="fa fa-chart-bar" style="margin-right:8px;"></i>Monthly Orders</h3>
+            <div class="chart-bars" id="ordersChart"></div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--gold);"></div>
+                Orders
+              </div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3><i class="fa fa-chart-line" style="margin-right:8px;"></i>Reservation Trends</h3>
+            <div class="chart-bars" id="reservationsChart"></div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--blue);"></div>
+                Reservations
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent orders mini table -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-clock" style="margin-right:8px;"></i>Recent Orders</h3>
+            <button class="btn-sm btn-outline-sm" onclick="navigate('orders')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table id="recentOrdersTable">
+              <thead>
+                <tr>
+                  <th>Customer</th><th>Items</th><th>Amount</th><th>Type</th><th>Status</th><th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <tr><td colspan="6" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ORDERS ========== -->
+      <div class="admin-page" id="page-orders">
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-shopping-bag" style="margin-right:8px;"></i>All Orders</h3>
+            <div class="table-actions">
+              <input type="text" class="tbl-search" id="orderSearch" placeholder="Search orders…" />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th><th>Phone</th><th>Items</th><th>Amount</th>
+                  <th>Type</th><th>Status</th><th>Date</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr><td colspan="8" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== RESERVATIONS ========== -->
+      <div class="admin-page" id="page-reservations">
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-calendar-alt" style="margin-right:8px;"></i>Reservations</h3>
+            <div class="table-actions">
+              <input type="text" class="tbl-search" id="resSearch" placeholder="Search…" />
+              <button class="btn-sm btn-outline-sm" id="exportCsvBtn">
+                <i class="fa fa-download" style="margin-right:4px;"></i>Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Phone</th><th>Date</th><th>Time</th>
+                  <th>Guests</th><th>Special Request</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resTableBody">
+                <tr><td colspan="8" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== MENU ========== -->
+      <div class="admin-page" id="page-menu">
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-utensils" style="margin-right:8px;"></i>Menu Items</h3>
+            <div class="table-actions">
+              <input type="text" class="tbl-search" id="menuSearch" placeholder="Search items…" />
+              <button class="btn-sm btn-gold-sm" id="addMenuItemBtn">
+                <i class="fa fa-plus" style="margin-right:4px;"></i>Add Item
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Category</th><th>Price</th><th>Available</th><th>Featured</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="menuTableBody">
+                <tr><td colspan="6" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== REVIEWS ========== -->
+      <div class="admin-page" id="page-reviews">
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-star" style="margin-right:8px;"></i>Guest Reviews</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Guest</th><th>Rating</th><th>Message</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="reviewsTableBody">
+                <tr><td colspan="5" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== MESSAGES ========== -->
+      <div class="admin-page" id="page-messages">
+        <div class="table-card">
+          <div class="table-header">
+            <h3><i class="fa fa-envelope" style="margin-right:8px;"></i>Contact Messages</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="messagesTableBody">
+                <tr><td colspan="6" class="empty-state"><i class="fa fa-spinner fa-spin"></i></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-area -->
+</div><!-- /admin-app -->
+
+<!-- ==================== MENU ITEM MODAL ==================== -->
+<div class="admin-modal-overlay" id="menuItemModal">
+  <div class="admin-modal">
+    <h3 id="menuItemModalTitle">Add Menu Item</h3>
+    <input type="hidden" id="menuItemId" />
+    <div class="form-group">
+      <label>Name *</label>
+      <input type="text" id="miName" placeholder="e.g. Signature Gold Espresso" />
+    </div>
+    <div class="form-group">
+      <label>Category *</label>
+      <select id="miCategory">
+        <option value="">Select category</option>
+        <option value="Coffee">Coffee</option>
+        <option value="Tea">Tea</option>
+        <option value="Snacks">Snacks</option>
+        <option value="Desserts">Desserts</option>
+        <option value="Main Course">Main Course</option>
+        <option value="Beverages">Beverages</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Price (₹) *</label>
+      <input type="number" id="miPrice" placeholder="e.g. 250" min="0" />
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="miDescription" placeholder="Short description of the item…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Image URL</label>
+      <input type="url" id="miImage" placeholder="https://…" />
+    </div>
+    <div class="form-group toggle">
+      <input type="checkbox" id="miAvailable" checked />
+      <label for="miAvailable">Available for ordering</label>
+    </div>
+    <div class="form-group toggle">
+      <input type="checkbox" id="miFeatured" />
+      <label for="miFeatured">Mark as Featured</label>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="cancelMenuModal">Cancel</button>
+      <button class="btn-confirm" id="saveMenuItemBtn">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="adminToastContainer"></div>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>
